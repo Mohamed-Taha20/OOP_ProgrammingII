@@ -1,6 +1,7 @@
 #include "machine.h"
 
-string binary(int n,string s){
+// convert an integer to binary
+string int_to_binary(int n,string s){
     for (int i = 3; i >= 0; --i) {
         int k = n >> i;
         if(k&1){
@@ -12,19 +13,21 @@ string binary(int n,string s){
     }
     return s;
 }
-
+// adding to binary numbers in two's complement format
 string ADDING_2s(string comp1,string comp2){
     bool negative = false,negative1 = false;
     if(comp1[0] == '1')negative=true;
     if(comp2[0] == '1')negative1=true;
     if(negative){
         int ones=0;
+        // catching the first 1 in the binary string
         for (int i = comp1.size()-1; i >= 0; --i) {
             if (comp1[i] == '1'){
                 ones = i;
                 break;
             }
         }
+        // converting after the first 1 in the binary string
         for (int i = ones - 1; i >= 0; --i) {
             if(comp1[i] == '1'){
                 comp1[i] = '0';
@@ -36,12 +39,14 @@ string ADDING_2s(string comp1,string comp2){
     }
     else if(negative1){
         int ones=0;
+        // catching the first 1 in the binary string
         for (int i = comp2.size()-1; i >= 0; --i) {
             if (comp2[i] == '1'){
                 ones = i;
                 break;
             }
         }
+         // converting after the first 1 in the binary string
         for (int i = ones - 1; i >= 0; --i) {
             if(comp2[i] == '1'){
                 comp2[i] = '0';
@@ -52,6 +57,7 @@ string ADDING_2s(string comp1,string comp2){
         }
     }
     string summation="";char reminder;
+    // calculate the sum of the comp1 and comp2 
     for (int i = comp1.size()-1; i >= 0; --i) {
         int sum = (comp1[i]-'0') + (comp2[i]-'0');
         char sum_ = (sum+'0');
@@ -84,6 +90,7 @@ string ADDING_2s(string comp1,string comp2){
         }
     }
     if(negative1 || negative){
+        // ignore the remainder if exists
         return summation;
     }
     else if(reminder == '1'){
@@ -93,39 +100,23 @@ string ADDING_2s(string comp1,string comp2){
         return summation;
     }
 }
-
-int convert_str(string converter){
-    int convert=0;
-    if(converter.size() == 2){
-        convert+=(converter[0]-'0')*10;
-        convert+=(converter[1]-'0');
-    }
-    else if(converter.size() == 1){
-        convert+=(converter[0]-'0');
-    }
-    else if(converter.size() == 3){
-        convert+=(converter[0]-'0')*100;
-        convert+=(converter[1]-'0')*10;
-        convert+=(converter[2]-'0');
-    }
-    return convert;
-}
-
+// convert a hexadecimal string to its equivalent in binary format
 string convert_hex_bin(string hex){
     string bin="";
     for (int i = 0; i < hex.size(); ++i) {
         if(hex[i] >= 'A' && hex[i] <= 'F'){
-            bin = bin + binary(hex[i] - 'A' + 10,"");
+            bin = bin + int_to_binary(hex[i] - 'A' + 10,"");
         }
         else{
-            bin = bin + binary(hex[i] - '0',"");
+            bin = bin + int_to_binary(hex[i] - '0',"");
         }
     }
     return bin;
 }
-
+// convert a binary string to its hex representation
 string convert_bin_hex(string bin){
     string hex="";int sum=0,sum1=0;char hexa;
+    // marking the ones in the binary string and adding the digit wight to sum
     for (int i = bin.size()-1,j=0; i >= 4; --i,j++) {
         if(bin[i] == '1'){
             sum+= pow(2,j);
@@ -154,7 +145,7 @@ string convert_bin_hex(string bin){
     }
     return hex;
 }
-
+// convert a decimal number to a hex string
 string convert_dec_hex(int dec){
     string hex;
     if(dec > 9){
@@ -164,11 +155,11 @@ string convert_dec_hex(int dec){
     hex = (dec+'0');
     return hex;
 }
-
+// convert a binaey string to its decimal representation
 int binaryToDecimal(const string& binaryStr) {
     int decimalNum = 0;
     int power = binaryStr.length() - 1;
-
+    // adding the digit`s wight to decimalNum
     for (char digit : binaryStr) {
         decimalNum += (digit - '0') * (1 << power);
         power--;
@@ -177,27 +168,30 @@ int binaryToDecimal(const string& binaryStr) {
     return decimalNum;
 }
 
-machine_language::machine_language() {
+machine_language::machine_language() { 
+    //setting all the array to zeros
     fill_n(memory,memory_size,"00");
     fill_n(Register,Register_size,"00");
 }
 
 void machine_language::Fetch(string instruct) {
+    // fetching each instraction to excute it
     instruction = instruct;
 }
 
 void machine_language::print_register() {
+    // printing all the registers for the user if he chooses to
     for (int i = 0; i < Register_size; ++i) {
         cout << "R"<< convert_dec_hex(i) << ": " << Register[i] << "\n";
     }
 }
-
+// converting from decimal to hexadecimal representation
 string machine_language::decimal_to_hexa(int decimal){
     stringstream sstring;
     sstring << hex<< uppercase << decimal;
     return sstring.str();
 }
-
+// displaying all the memory for the user
 void machine_language:: display_memory() {
     for (int i = 0; i < memory_size; ++i) {
         if(i % 15 == 0){
@@ -206,7 +200,8 @@ void machine_language:: display_memory() {
         cout << decimal_to_hexa(i) << ": " << memory[i] << ", " ;
     }
 }
-
+// check if the instraction is valid
+// if not the program will terminate
 bool machine_language::is_valid(string instruct){
     for (int i = 0; i < instruct.size(); ++i) {
         if(instruct[i] >= '0' && instruct[i] <= '9'){
@@ -223,13 +218,15 @@ bool machine_language::is_valid(string instruct){
 }
 
 void machine_language::execute(){
+    // checking if the instruction are valid before executing
     if(is_valid(instruction)){
         if(instruction[0] == '1'){
             string alocate = instruction.substr(2,2),regist = "";
             regist=(instruction[1]);
             Register[binaryToDecimal(convert_hex_bin(regist))] = memory[convert_str(alocate)];
         }
-        else if(instruction[0] == '2'){
+        // looping for each instruction to excute      
+        else if(instruction[0] == '2'){ 
             string alocate = instruction.substr(2,2),regist = "";
             regist=(instruction[1]);
             Register[binaryToDecimal(convert_hex_bin(regist))] = alocate;
@@ -284,4 +281,3 @@ void machine_language::execute(){
         exit(0);
     }
 }
-
