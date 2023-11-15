@@ -300,11 +300,16 @@ void machine_language::execute()
             Register[binaryToDecimal(convert_hex_bin(regist))] = alocate;
         }
         // STORE the bit pattern found in register R in the memory cell whose address is XY.
-        else if (instruction[0] == '3')
-        {
-            string alocate = instruction.substr(2, 2), regist;
-            regist = (instruction[1]);
-            memory[binaryToDecimal(convert_hex_bin(alocate))] = Register[binaryToDecimal(convert_hex_bin(regist))];
+        else if(instruction[0] == '3'){
+            if (instruction[2] == '0' && instruction[3] == '0') {
+               memory[binaryToDecimal(convert_hex_bin(instruction.substr(2,2)))] = Register[binaryToDecimal(convert_hex_bin(instruction.substr(1,1)))] ;
+               cout << memory[binaryToDecimal(convert_hex_bin(instruction.substr(2,2)))];
+            }
+            else{
+                string alocate = instruction.substr(2,2),regist;
+                regist=(instruction[1]);
+                memory[binaryToDecimal(convert_hex_bin(alocate))] = Register[binaryToDecimal(convert_hex_bin(regist))];
+            }
         }
         // MOVE the bit pattern found in register R to register S.
         else if (instruction[0] == '4')
