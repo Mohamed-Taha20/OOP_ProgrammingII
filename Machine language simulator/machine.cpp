@@ -223,7 +223,7 @@ void machine_language::execute(){
         if(instruction[0] == '1'){
             string alocate = instruction.substr(2,2),regist = "";
             regist=(instruction[1]);
-            Register[binaryToDecimal(convert_hex_bin(regist))] = memory[convert_str(alocate)];
+            Register[binaryToDecimal(convert_hex_bin(regist))] = memory[binaryToDecimal(convert_hex_bin(alocate))];
         }
         // looping for each instruction to excute      
         else if(instruction[0] == '2'){ 
